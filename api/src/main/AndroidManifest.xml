@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="cn.framework.mpsharedpreferences">
+
+    <application>
+        <provider android:name="cn.framework.mpsharedpreferences.MPSPContentProvider"
+            android:authorities="${applicationId}.multiprocesssharedpreferences" />
+    </application>
+
+</manifest>

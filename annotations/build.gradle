@@ -1,0 +1,146 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2015 David Medenjak
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2015 David Medenjak
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+buildscript {
+    repositories {
+        mavenLocal()
+//        mavenCentral()
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'maven'
+//apply plugin: 'signing'
+
+compileJava {
+    sourceCompatibility = 1.6
+    targetCompatibility = 1.7
+}
+
+archivesBaseName = "annotations"
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.google.android:android:4.1.1.4'
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+//signing {
+//    sign configurations.archives
+//}
+
+def ossrhUsername = System.properties['ossrhUsername']
+def ossrhPassword = System.properties['ossrhPassword']
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+
+
+            repository(url: mavenLocal().getUrl())
+
+
+//            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+//
+//            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+//                authentication(userName: ossrhUsername, password: ossrhPassword)
+//            }
+//
+//            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+//                authentication(userName: ossrhUsername, password: ossrhPassword)
+//            }
+//
+//            pom.project {
+//                name 'SharedPreferences Annotations'
+//                packaging 'jar'
+//                // optionally artifactId can be defined here
+//                description 'Annotations to generate Source Code ' +
+//                        'used by the Annotation Processor in cn.framework.mpsharedpreferences:processor'
+//                url 'https://github.com/sevenshal/multiprocesssharedpreferences-api'
+//
+//                scm {
+//                    connection 'scm:git:ssh://git@github.com/sevenshal/multiprocesssharedpreferences-api.git'
+//                    developerConnection 'scm:git:ssh://git@github.com/sevenshal/multiprocesssharedpreferences-api.git'
+//                    url 'https://github.com/sevenshal/multiprocesssharedpreferences-api'
+//                }
+//
+//                licenses {
+//                    license {
+//                        name 'MIT License'
+//                        url 'http://www.opensource.org/licenses/mit-license.php'
+//                    }
+//                }
+//
+//                developers {
+//                    developer {
+//                        id 'sevenshal'
+//                        name 'David Medenjak'
+//                        email 'davidmedenjak@gmail.com'
+//                        url 'https://github.com/sevenshal '
+//                        roles {
+//                            role 'owner'
+//                            role 'developer'
+//                        }
+//                        timezone '+1'
+//                    }
+//                }
+//            }
+        }
+    }
+}
