@@ -40,12 +40,10 @@ public class MPSPContentProvider extends ContentProvider {
     private static final int GET_LONG = 4;
     private static final int GET_FLOAT = 5;
     private static final int GET_BOOLEAN = 6;
-    private static final int CONTAINS = 7;
-    private static final int APPLY = 8;
-    private static final int COMMIT = 9;
-    private static final int REGISTER_ON_SHARED_PREFERENCE_CHANGE_LISTENER = 10;
-    private static final int UNREGISTER_ON_SHARED_PREFERENCE_CHANGE_LISTENER = 11;
-    private static final int GET_STRING_SET = 12;
+    private static final int GET_STRING_SET = 7;
+    private static final int CONTAINS = 8;
+    private static final int APPLY = 9;
+    private static final int COMMIT = 10;
     private HashMap<String, Integer> mListenersCount;
 
     @Override
@@ -85,29 +83,6 @@ public class MPSPContentProvider extends ContentProvider {
             case CONTAINS:
                 bundle.putBoolean(KEY_VALUE, sp.contains(key));
                 break;
-            case REGISTER_ON_SHARED_PREFERENCE_CHANGE_LISTENER: {
-                checkInitListenersCount();
-                Integer countInteger = mListenersCount.get(name);
-                int count = (countInteger == null ? 0 : countInteger) + 1;
-                mListenersCount.put(name, count);
-                countInteger = mListenersCount.get(name);
-                bundle.putBoolean(KEY_VALUE, count == (countInteger == null ? 0 : countInteger));
-            }
-            break;
-            case UNREGISTER_ON_SHARED_PREFERENCE_CHANGE_LISTENER: {
-                checkInitListenersCount();
-                Integer countInteger = mListenersCount.get(name);
-                int count = (countInteger == null ? 0 : countInteger) - 1;
-                if (count <= 0) {
-                    mListenersCount.remove(name);
-                    bundle.putBoolean(KEY_VALUE, !mListenersCount.containsKey(name));
-                } else {
-                    mListenersCount.put(name, count);
-                    countInteger = mListenersCount.get(name);
-                    bundle.putBoolean(KEY_VALUE, count == (countInteger == null ? 0 : countInteger));
-                }
-            }
-            break;
             case APPLY:
             case COMMIT: {
                 boolean clear = extras.getBoolean(KEY_CLEAR, false);
