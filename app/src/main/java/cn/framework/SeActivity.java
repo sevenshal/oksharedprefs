@@ -22,7 +22,7 @@ public class SeActivity extends Activity implements SharedPreferences.OnSharedPr
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        msgPrefs = new MsgPrefs(this, "test");
+        msgPrefs = MsgPrefs.sharedInstance(this);
         Log.d("MP", "did:" + msgPrefs.getDeviceId()
                 + ";uid:" + msgPrefs.getUserid()
                 + ";l:" + msgPrefs.isLogin() + ";s:" + msgPrefs.getToken());

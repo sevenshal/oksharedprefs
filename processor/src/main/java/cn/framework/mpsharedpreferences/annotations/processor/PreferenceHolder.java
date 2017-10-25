@@ -146,14 +146,31 @@ public class PreferenceHolder {
         }
         mWriter.emitEmptyLine();
 
+        mWriter.emitField(className, "instance", Modifier.PRIVATE_STATIC, null);
+
         mWriter.emitField("String", "PREFERENCES_NAME", Modifier.PUBLIC_FINAL_STATIC, "\"" + preferencesName + "\"");
+
 //        mWriter.emitField("SharedPreferences", PREFERENCES, Modifier.PRIVATE_FINAL)
 //                .emitEmptyLine();
+
+        mWriter.emitJavadoc("single instance using '%1$s' for preferences name.\n@param %2$s the context to use"
+                , preferencesName, PAR_CONTEXT)
+                .beginMethod(className, "sharedInstance", Modifier.PUBLIC_STATIC, "Context" , PAR_CONTEXT)
+                .beginControlFlow("if (instance == null)")
+                .beginControlFlow("synchronized (%1$s.class)", className)
+                .beginControlFlow("if (instance == null)")
+                .emitStatement("instance = new %1$s(%2$s.getApplicationContext())", className, PAR_CONTEXT)
+                .endControlFlow()
+                .endControlFlow()
+                .endControlFlow()
+                .emitStatement("return instance")
+                .endMethod()
+                .emitEmptyLine();
 
         // default constructor with context using default preferences name
         mWriter.emitJavadoc("constructor using '%1$s' for the preferences name.\n@param %2$s the context to use",
                 preferencesName, PAR_CONTEXT)
-                .beginConstructor(Modifier.PUBLIC, "Context", PAR_CONTEXT)
+                .beginConstructor(Modifier.PRIVATE, "Context", PAR_CONTEXT)
                 .emitStatement("this(%1$s, %2$s)",
                         PAR_CONTEXT, "PREFERENCES_NAME")
                 .endConstructor()
