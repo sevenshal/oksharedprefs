@@ -148,14 +148,15 @@ public class PreferenceHolder {
 
         mWriter.emitField(className, "instance", Modifier.PRIVATE_STATIC, null);
 
-        mWriter.emitField("String", "PREFERENCES_NAME", Modifier.PUBLIC_FINAL_STATIC, "\"" + preferencesName + "\"");
+        mWriter.emitField("String", "PREFERENCES_NAME", Modifier.PUBLIC_FINAL_STATIC, "\"" + preferencesName + "\"")
+                .emitEmptyLine();
 
 //        mWriter.emitField("SharedPreferences", PREFERENCES, Modifier.PRIVATE_FINAL)
 //                .emitEmptyLine();
 
         mWriter.emitJavadoc("single instance using '%1$s' for preferences name.\n@param %2$s the context to use"
                 , preferencesName, PAR_CONTEXT)
-                .beginMethod(className, "sharedInstance", Modifier.PUBLIC_STATIC, "Context" , PAR_CONTEXT)
+                .beginMethod(className, "sharedInstance", Modifier.PUBLIC_STATIC, "Context", PAR_CONTEXT)
                 .beginControlFlow("if (instance == null)")
                 .beginControlFlow("synchronized (%1$s.class)", className)
                 .beginControlFlow("if (instance == null)")
