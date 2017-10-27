@@ -133,16 +133,16 @@ public class PreferenceHolder {
                 .emitImports(Context.class, SharedPreferences.class)
                 .emitImports("android.content.SharedPreferences.Editor",
                         "android.content.SharedPreferences.OnSharedPreferenceChangeListener",
-                        "cn.framework.mpsharedpreferences.BasePrefs")
+                        "cn.framework.mpsharedpreferences.MPSPUtils")
                 .emitEmptyLine()
                 .emitImports(Set.class)
                 .emitEmptyLine();
         if (implSharedPreference) {
             mWriter.beginType(className, "class", Modifier.PUBLIC,
-                    "BasePrefs", mElement.getSimpleName().toString(), "SharedPreferences");
+                    null, mElement.getSimpleName().toString(), "SharedPreferences");
         } else {
             mWriter.beginType(className, "class", Modifier.PUBLIC,
-                    "BasePrefs", mElement.getSimpleName().toString());
+                    null, mElement.getSimpleName().toString());
         }
         mWriter.emitEmptyLine();
 
@@ -151,8 +151,8 @@ public class PreferenceHolder {
         mWriter.emitField("String", "PREFERENCES_NAME", Modifier.PUBLIC_FINAL_STATIC, "\"" + preferencesName + "\"")
                 .emitEmptyLine();
 
-//        mWriter.emitField("SharedPreferences", PREFERENCES, Modifier.PRIVATE_FINAL)
-//                .emitEmptyLine();
+        mWriter.emitField("SharedPreferences", PREFERENCES, Modifier.PRIVATE_FINAL)
+                .emitEmptyLine();
 
         mWriter.emitJavadoc("single instance using '%1$s' for preferences name.\n@param %2$s the context to use"
                 , preferencesName, PAR_CONTEXT)
@@ -182,7 +182,7 @@ public class PreferenceHolder {
                         "@param %3$s the context to use\n@param %2$s the name for the preferences",
                 preferencesName, PAR_NAME, PAR_CONTEXT)
                 .beginConstructor(Modifier.PUBLIC, "Context", PAR_CONTEXT, "String", PAR_NAME)
-                .emitStatement("super(%1$s,%2$s)", PAR_CONTEXT, PAR_NAME)
+                .emitStatement("this.%1s = MPSPUtils.getSharedPref(%2s, %3s)", PREFERENCES, PAR_CONTEXT, PAR_NAME)
                 .endConstructor();
 
         // constructor with preferences
@@ -196,7 +196,7 @@ public class PreferenceHolder {
         if (implSharedPreference) {
             wrapSharedPreferencesInterface(Modifier.PUBLIC, editorName, PREFERENCES, SharedPreferences.class.getMethods());
         } else {
-            writeEditMethod(Modifier.PUBLIC, editorName, EDITOR, SharedPreferences.Editor.class.getMethods());
+            writeCommonMethod(Modifier.PUBLIC, editorName, EDITOR, SharedPreferences.Editor.class.getMethods());
         }
 
         // creating accessors for the fields annotated
@@ -251,10 +251,13 @@ public class PreferenceHolder {
         }
     }
 
-    private void writeEditMethod(Set<javax.lang.model.element.Modifier> modifiersPublic, String editor, String wrappedElement, Method[] methods) throws IOException {
+    private void writeCommonMethod(Set<javax.lang.model.element.Modifier> modifiersPublic, String editor, String wrappedElement, Method[] methods) throws IOException {
 //        final String params = beginMethod(modifiersPublic, editor, method, isCustomWrapperNeeded);
         mWriter.emitEmptyLine().beginMethod(editor, "edit", modifiersPublic)
                 .emitStatement("return new %1$s(mPreferences.edit())", editor).endMethod();
+        mWriter.emitEmptyLine().beginMethod("SharedPreferences", "prefs", modifiersPublic)
+                .emitStatement("return this.%1$s", PREFERENCES).endMethod();
+
     }
 
     private void wrapEditorInterface(Set<javax.lang.model.element.Modifier> modifiersPublic, String editor, String wrappedElement, Method[] methods) throws IOException {

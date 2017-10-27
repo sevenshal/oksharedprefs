@@ -3,7 +3,6 @@ package cn.framework.mpsharedpreferences;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.pm.ProviderInfo;
 import android.net.Uri;
 import android.os.Process;
@@ -15,27 +14,31 @@ import java.util.HashMap;
 import java.util.Locale;
 
 /**
- * Created by sevenshal on 2017/10/23.
+ * Created by sevenshal on 2017/10/26.
  */
 
-public class BasePrefs {
+public class MPSPUtils {
 
-    protected SharedPreferences mPreferences;
-
-    private static String processName;
+    private static Boolean isProviderProcess;
 
     private static HashMap<String, SharedPreferences.OnSharedPreferenceChangeListener> listenerHashMap;
 
-    static {
+    private static boolean isProviderProcess(Context ctx) {
+        if (isProviderProcess != null) {
+            return isProviderProcess;
+        }
         String processCmdPath = String.format(Locale.getDefault(),
                 "/proc/%d/cmdline", Process.myPid());
         BufferedReader inputStream = null;
         try {
             inputStream = new BufferedReader(new FileReader(
                     processCmdPath));
-            processName = inputStream.readLine().trim();
+            String processName = inputStream.readLine().trim();
+            ProviderInfo providerInfo = ctx.getPackageManager().getProviderInfo(new ComponentName(ctx, MPSPContentProvider.class), 0);
+            isProviderProcess = TextUtils.equals(providerInfo.processName, processName);
+            return isProviderProcess;
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         } finally {
             try {
                 if (inputStream != null) {
@@ -47,17 +50,7 @@ public class BasePrefs {
         }
     }
 
-    protected BasePrefs(Context ctx, final String name) {
-        try {
-            ProviderInfo providerInfo = ctx.getPackageManager().getProviderInfo(new ComponentName(ctx, MPSPContentProvider.class), 0);
-            if (!TextUtils.equals(providerInfo.processName, processName)) {
-                mPreferences = MPSPContentProvider.getSharedPreferences(ctx, name, Context.MODE_PRIVATE);
-                return;
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        this.mPreferences = ctx.getSharedPreferences(name, Context.MODE_PRIVATE);
+    private static void registListener(Context ctx, SharedPreferences pref, final String name) {
         if (listenerHashMap == null || listenerHashMap.get(name) == null) {
             synchronized (BasePrefs.class) {
                 if (listenerHashMap == null) {
@@ -73,14 +66,22 @@ public class BasePrefs {
                             appCtx.getContentResolver().notifyChange(uri, null);
                         }
                     };
-                    mPreferences.registerOnSharedPreferenceChangeListener(listener);
+                    pref.registerOnSharedPreferenceChangeListener(listener);
                     listenerHashMap.put(name, listener);
                 }
             }
         }
     }
 
-    public SharedPreferences prefs() {
-        return mPreferences;
+    public static SharedPreferences getSharedPref(Context ctx, String name) {
+        SharedPreferences preferences;
+        if (MPSPUtils.isProviderProcess(ctx)) {
+            preferences = ctx.getSharedPreferences(name, Context.MODE_PRIVATE);
+            MPSPUtils.registListener(ctx, preferences, name);
+        } else {
+            preferences = MPSPContentProvider.getSharedPreferences(ctx, name, Context.MODE_PRIVATE);
+        }
+        return preferences;
     }
+
 }
