@@ -1,4 +1,4 @@
-package cn.framework.mpsharedpreferences.annotations.processor;
+package cn.framework.oksharedpref.annotations.processor;
 
 import java.util.LinkedHashSet;
 import java.util.Set;

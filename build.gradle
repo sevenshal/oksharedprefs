@@ -19,6 +19,6 @@ allprojects {
         jcenter()
     }
 
-    group = 'cn.framework.mpsharedpreferences'
-    version = '1.0'
+    group = 'cn.framework.oksharedpref'
+    version = '1.0.0'
 }

@@ -22,8 +22,7 @@
  * SOFTWARE.
  */
 
-package cn.framework.mpsharedpreferences.annotations;
-
+package cn.framework.oksharedpref.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -31,27 +30,27 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <p>The preferences type of this single property.
- * The getter and setter will be genereated with the supplied type.</p>
- * Supported types are of {@link PreferenceType}
+ * Used to set the default value for this preference. THis value is supplied as String, because
+ * the code is generated and the value simply inserted as is. Please be sure to support a valid
+ * value.
+ * <p>By setting {@link #createDefaultGetter} to <b>false</b> you
+ * can suppress the additional getter of the form <em>get(Type defaultValue)</em>.</p>
  *
  * @author sevenshal
  * @version 1.0
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.FIELD)
-public @interface Type {
+public @interface DefaultValue {
     /**
-     * the type of the preference element.
-     *
-     * @return the type
+     * Supplies the default value to use for a preference in String format. e.g. "3.0f", "hi", ...
+     * @return the value to use as String.
      */
-    PreferenceType value();
+    String value();
 
     /**
-     * <b>if</b> the type is a boolean, you can set the getter prefix here.
-     *
-     * @return the prefix for the getter, "is" by default.
+     * Used to specify the creation of the default getter of the form <em>get(Type defaultValue)</em>.
+     * @return default true, to create the default getter nonetheless.
      */
-    String booleanPrefix() default "is";
+    boolean createDefaultGetter() default true;
 }

@@ -29,8 +29,8 @@ dependencies {
     compile 'com.android.support:design:26.+'
     testCompile 'junit:junit:4.12'
 
-    compile 'cn.framework.mpsharedpreferences:api:1.0'
-    annotationProcessor 'cn.framework.mpsharedpreferences:processor:1.0'
+    compile 'cn.framework.oksharedpref:api:1.0.0'
+    annotationProcessor 'cn.framework.oksharedpref:processor:1.0.0'
 
 
 //    compile project(':api')

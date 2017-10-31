@@ -1,4 +1,4 @@
-package cn.framework.mpsharedpreferences;
+package cn.framework.oksharedpref;
 
 import android.content.ContentProvider;
 import android.content.ContentResolver;
@@ -22,7 +22,7 @@ import java.util.Set;
 /**
  * 使用ContentProvider实现多进程SharedPreferences读写
  */
-public class MPSPContentProvider extends ContentProvider {
+public class OkSharedPrefContentProvider extends ContentProvider {
     private static final String TAG = "MPSP";
 
     private static String AUTHORITY;
@@ -140,10 +140,10 @@ public class MPSPContentProvider extends ContentProvider {
 
     public static Uri getAuthorityUri(Context context, String name) {
         if (AUTHORITY_URI == null) {
-            synchronized (MPSPContentProvider.class) {
+            synchronized (OkSharedPrefContentProvider.class) {
                 if (AUTHORITY_URI == null) {
                     if (AUTHORITY == null) {
-                        AUTHORITY = context.getPackageName() + ".multiprocesssharedpreferences";
+                        AUTHORITY = context.getPackageName() + ".oksharedpref";
                     }
                     AUTHORITY_URI = Uri.parse(ContentResolver.SCHEME_CONTENT + "://" + AUTHORITY);
                 }
@@ -210,7 +210,7 @@ public class MPSPContentProvider extends ContentProvider {
      * @deprecated 此默认构造函数只用于父类ContentProvider在初始化时使用；
      */
     @Deprecated
-    public MPSPContentProvider() {
+    public OkSharedPrefContentProvider() {
 
     }
 
@@ -454,7 +454,7 @@ public class MPSPContentProvider extends ContentProvider {
     }
 
     private static String makeAction(String name) {
-        return String.format("%1$s_%2$s", MPSPContentProvider.class.getName(), name);
+        return String.format("%1$s_%2$s", OkSharedPrefContentProvider.class.getName(), name);
     }
 
     @Override

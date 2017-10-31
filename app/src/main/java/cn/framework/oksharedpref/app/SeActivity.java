@@ -1,4 +1,4 @@
-package cn.framework;
+package cn.framework.oksharedpref.app;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -8,8 +8,6 @@ import android.util.Log;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import cn.framework.mpsharedpreferences.app.MsgPrefs;
 
 /**
  * Created by sevenshal on 2017/10/23.

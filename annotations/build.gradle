@@ -111,13 +111,13 @@ uploadArchives {
 //                packaging 'jar'
 //                // optionally artifactId can be defined here
 //                description 'Annotations to generate Source Code ' +
-//                        'used by the Annotation Processor in cn.framework.mpsharedpreferences:processor'
-//                url 'https://github.com/sevenshal/multiprocesssharedpreferences-api'
+//                        'used by the Annotation Processor in cn.framework.oksharedpref:processor'
+//                url 'https://github.com/sevenshal/oksharedpref-api'
 //
 //                scm {
-//                    connection 'scm:git:ssh://git@github.com/sevenshal/multiprocesssharedpreferences-api.git'
-//                    developerConnection 'scm:git:ssh://git@github.com/sevenshal/multiprocesssharedpreferences-api.git'
-//                    url 'https://github.com/sevenshal/multiprocesssharedpreferences-api'
+//                    connection 'scm:git:ssh://git@github.com/sevenshal/oksharedpref-api.git'
+//                    developerConnection 'scm:git:ssh://git@github.com/sevenshal/oksharedpref-api.git'
+//                    url 'https://github.com/sevenshal/oksharedpref-api'
 //                }
 //
 //                licenses {

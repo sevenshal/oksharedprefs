@@ -1,10 +1,10 @@
-package cn.framework.mpsharedpreferences.app;
+package cn.framework.oksharedpref.app;
 
 
-import cn.framework.mpsharedpreferences.annotations.DefaultValue;
-import cn.framework.mpsharedpreferences.annotations.PreferenceType;
-import cn.framework.mpsharedpreferences.annotations.SharedPreference;
-import cn.framework.mpsharedpreferences.annotations.Type;
+import cn.framework.oksharedpref.annotations.DefaultValue;
+import cn.framework.oksharedpref.annotations.PreferenceType;
+import cn.framework.oksharedpref.annotations.SharedPreference;
+import cn.framework.oksharedpref.annotations.Type;
 
 /**
  * Created by sevenshal on 2016/11/28.

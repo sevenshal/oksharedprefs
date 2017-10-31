@@ -1,4 +1,4 @@
-package cn.framework;
+package cn.framework.oksharedpref.app;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,7 +13,7 @@ import android.view.View;
 import java.util.HashSet;
 import java.util.Set;
 
-import cn.framework.mpsharedpreferences.app.MsgPrefs;
+import cn.framework.R;
 
 public class MainActivity extends AppCompatActivity {
 

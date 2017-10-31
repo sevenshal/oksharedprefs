@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package cn.framework.mpsharedpreferences.annotations;
+package cn.framework.oksharedpref.annotations;
 
 /**
  * The usable types of the properties in the preferences. Used to set the return type

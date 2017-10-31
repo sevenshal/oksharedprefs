@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package cn.framework.mpsharedpreferences.annotations.processor;
+package cn.framework.oksharedpref.annotations.processor;
 
 
 import java.io.IOException;
@@ -37,10 +37,10 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 
-import cn.framework.mpsharedpreferences.annotations.SharedPreference;
+import cn.framework.oksharedpref.annotations.SharedPreference;
 
 
-@SupportedAnnotationTypes("cn.framework.mpsharedpreferences.annotations.SharedPreference")
+@SupportedAnnotationTypes("cn.framework.oksharedpref.annotations.SharedPreference")
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class SharedPreferencesAnnotationProcessor extends AbstractProcessor {
 

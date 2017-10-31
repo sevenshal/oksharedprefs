@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package cn.framework.mpsharedpreferences.annotations.processor;
+package cn.framework.oksharedpref.annotations.processor;
 
 import com.squareup.javawriter.JavaWriter;
 
@@ -33,9 +33,9 @@ import java.util.Set;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
 
-import cn.framework.mpsharedpreferences.annotations.DefaultValue;
-import cn.framework.mpsharedpreferences.annotations.PreferenceType;
-import cn.framework.mpsharedpreferences.annotations.Type;
+import cn.framework.oksharedpref.annotations.DefaultValue;
+import cn.framework.oksharedpref.annotations.PreferenceType;
+import cn.framework.oksharedpref.annotations.Type;
 
 /**
  * @author sevenshal

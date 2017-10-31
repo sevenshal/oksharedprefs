@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package cn.framework.mpsharedpreferences.annotations;
+package cn.framework.oksharedpref.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

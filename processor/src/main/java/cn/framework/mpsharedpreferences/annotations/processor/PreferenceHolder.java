@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package cn.framework.mpsharedpreferences.annotations.processor;
+package cn.framework.oksharedpref.annotations.processor;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -46,8 +46,8 @@ import javax.lang.model.element.VariableElement;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 
-import cn.framework.mpsharedpreferences.annotations.PreferenceType;
-import cn.framework.mpsharedpreferences.annotations.SharedPreference;
+import cn.framework.oksharedpref.annotations.PreferenceType;
+import cn.framework.oksharedpref.annotations.SharedPreference;
 
 /**
  * @author sevenshal
@@ -128,12 +128,12 @@ public class PreferenceHolder {
         mWriter.setIndent("    ");
         mWriter.emitPackage(getPackageName())
                 .emitSingleLineComment("generated code, do not modify")
-                .emitSingleLineComment("for more information see https://github.com/sevenshal/multiprocesssharedpreferences-api")
+                .emitSingleLineComment("for more information see https://github.com/sevenshal/oksharedpref-api")
                 .emitEmptyLine()
                 .emitImports(Context.class, SharedPreferences.class)
                 .emitImports("android.content.SharedPreferences.Editor",
                         "android.content.SharedPreferences.OnSharedPreferenceChangeListener",
-                        "cn.framework.mpsharedpreferences.MPSPUtils")
+                        "cn.framework.oksharedpref.MPSPUtils")
                 .emitEmptyLine()
                 .emitImports(Set.class)
                 .emitEmptyLine();

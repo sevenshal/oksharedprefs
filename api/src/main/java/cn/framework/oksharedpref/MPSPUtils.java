@@ -1,4 +1,4 @@
-package cn.framework.mpsharedpreferences;
+package cn.framework.oksharedpref;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -34,7 +34,7 @@ public class MPSPUtils {
             inputStream = new BufferedReader(new FileReader(
                     processCmdPath));
             String processName = inputStream.readLine().trim();
-            ProviderInfo providerInfo = ctx.getPackageManager().getProviderInfo(new ComponentName(ctx, MPSPContentProvider.class), 0);
+            ProviderInfo providerInfo = ctx.getPackageManager().getProviderInfo(new ComponentName(ctx, OkSharedPrefContentProvider.class), 0);
             isProviderProcess = TextUtils.equals(providerInfo.processName, processName);
             return isProviderProcess;
         } catch (Exception e) {
@@ -62,7 +62,7 @@ public class MPSPUtils {
                             .OnSharedPreferenceChangeListener() {
                         @Override
                         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                            Uri uri = Uri.withAppendedPath(MPSPContentProvider.getAuthorityUri(appCtx, name), key);
+                            Uri uri = Uri.withAppendedPath(OkSharedPrefContentProvider.getAuthorityUri(appCtx, name), key);
                             appCtx.getContentResolver().notifyChange(uri, null);
                         }
                     };
@@ -79,7 +79,7 @@ public class MPSPUtils {
             preferences = ctx.getSharedPreferences(name, Context.MODE_PRIVATE);
             MPSPUtils.registListener(ctx, preferences, name);
         } else {
-            preferences = MPSPContentProvider.getSharedPreferences(ctx, name, Context.MODE_PRIVATE);
+            preferences = OkSharedPrefContentProvider.getSharedPreferences(ctx, name, Context.MODE_PRIVATE);
         }
         return preferences;
     }

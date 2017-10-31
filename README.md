@@ -1,3 +1,3 @@
-# mpsharedpreferences
+# oksharedpref
 
-一款可以通过注解
+通过注解生成SharedPreferences实现的工具。支持多进程数据访问。

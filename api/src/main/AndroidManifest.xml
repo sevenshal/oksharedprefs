@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="cn.framework.mpsharedpreferences">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="cn.framework.oksharedpref">
 
     <application>
-        <provider android:name="cn.framework.mpsharedpreferences.MPSPContentProvider"
-            android:authorities="${applicationId}.multiprocesssharedpreferences" />
+        <provider android:name="cn.framework.oksharedpref.OkSharedPrefContentProvider"
+            android:authorities="${applicationId}.oksharedpref" />
     </application>
 
 </manifest>
