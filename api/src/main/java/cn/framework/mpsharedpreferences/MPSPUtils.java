@@ -52,7 +52,7 @@ public class MPSPUtils {
 
     private static void registListener(Context ctx, SharedPreferences pref, final String name) {
         if (listenerHashMap == null || listenerHashMap.get(name) == null) {
-            synchronized (BasePrefs.class) {
+            synchronized (MPSPUtils.class) {
                 if (listenerHashMap == null) {
                     listenerHashMap = new HashMap<>();
                 }
