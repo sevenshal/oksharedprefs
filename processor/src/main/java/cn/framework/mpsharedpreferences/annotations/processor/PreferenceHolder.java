@@ -61,6 +61,8 @@ public class PreferenceHolder {
     private final static String PREFERENCES = "mPreferences";
     private static final String EDITOR = "mEditor";
 
+    private final static String DEFAULT_INSTANCE = "instance";
+
     private static final String DEFAULT_PREFERENCES_NAME = "default_preferences";
 
     private final TypeElement mElement;
@@ -146,7 +148,7 @@ public class PreferenceHolder {
         }
         mWriter.emitEmptyLine();
 
-        mWriter.emitField(className, "instance", Modifier.PRIVATE_STATIC, null);
+        mWriter.emitField(className, DEFAULT_INSTANCE, Modifier.PRIVATE_STATIC, null);
 
         mWriter.emitField("String", "PREFERENCES_NAME", Modifier.PUBLIC_FINAL_STATIC, "\"" + preferencesName + "\"")
                 .emitEmptyLine();
@@ -156,11 +158,11 @@ public class PreferenceHolder {
 
         mWriter.emitJavadoc("single instance using '%1$s' for preferences name.\n@param %2$s the context to use"
                 , preferencesName, PAR_CONTEXT)
-                .beginMethod(className, "sharedInstance", Modifier.PUBLIC_STATIC, "Context", PAR_CONTEXT)
-                .beginControlFlow("if (instance == null)")
+                .beginMethod(className, "defaultInstance", Modifier.PUBLIC_STATIC, "Context", PAR_CONTEXT)
+                .beginControlFlow("if (%1$s == null)", DEFAULT_INSTANCE)
                 .beginControlFlow("synchronized (%1$s.class)", className)
-                .beginControlFlow("if (instance == null)")
-                .emitStatement("instance = new %1$s(%2$s.getApplicationContext())", className, PAR_CONTEXT)
+                .beginControlFlow("if (%1$s == null)", DEFAULT_INSTANCE)
+                .emitStatement("%1$s = new %2$s(%3$s.getApplicationContext())", DEFAULT_INSTANCE, className, PAR_CONTEXT)
                 .endControlFlow()
                 .endControlFlow()
                 .endControlFlow()
@@ -171,7 +173,7 @@ public class PreferenceHolder {
         // default constructor with context using default preferences name
         mWriter.emitJavadoc("constructor using '%1$s' for the preferences name.\n@param %2$s the context to use",
                 preferencesName, PAR_CONTEXT)
-                .beginConstructor(Modifier.PRIVATE, "Context", PAR_CONTEXT)
+                .beginConstructor(Modifier.PUBLIC, "Context", PAR_CONTEXT)
                 .emitStatement("this(%1$s, %2$s)",
                         PAR_CONTEXT, "PREFERENCES_NAME")
                 .endConstructor()

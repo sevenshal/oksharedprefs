@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        msgPrefs = MsgPrefs.sharedInstance(this);
+        msgPrefs = MsgPrefs.defaultInstance(this);
         Log.d("MPM", "did:" + msgPrefs.getDeviceId()
                 + ";uid:" + msgPrefs.getUserid()
                 + ";l:" + msgPrefs.isLogin() + ";s:" + msgPrefs.getToken());
