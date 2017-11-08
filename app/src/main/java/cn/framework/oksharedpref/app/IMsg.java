@@ -28,4 +28,6 @@ public interface IMsg {
     @DefaultValue(value = "false", createDefaultGetter = false)
     String LOGIN = "hasAuth";
 
+    String NICK_NAME = "nickName";
+
 }
