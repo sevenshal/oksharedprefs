@@ -84,4 +84,10 @@ public @interface SharedPreference {
      * @return true
      */
     boolean implSharedPreference() default true;
+
+    /**
+     * the sharedpreference can be used in multiprocess safely if true.
+     * @return
+     */
+    boolean multiProcess() default false;
 }

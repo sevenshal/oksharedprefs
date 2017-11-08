@@ -72,6 +72,7 @@ public class PreferenceHolder {
     private final String className;
     private final String editorName;
     private final boolean implSharedPreference;
+    private final boolean multiProcess;
 
     private final SortedMap<String, Preference> preferences = new TreeMap<>();
 
@@ -86,6 +87,7 @@ public class PreferenceHolder {
         className = name + sharedPreference.preferencesSuffix();
         editorName = name + sharedPreference.editorSuffix();
         implSharedPreference = sharedPreference.implSharedPreference();
+        multiProcess = sharedPreference.multiProcess();
         JavaFileObject jfo = filer.createSourceFile(getPackageName() + "." + className);
         this.mWriter = new JavaWriter(jfo.openWriter());
 
@@ -184,7 +186,10 @@ public class PreferenceHolder {
                         "@param %3$s the context to use\n@param %2$s the name for the preferences",
                 preferencesName, PAR_NAME, PAR_CONTEXT)
                 .beginConstructor(Modifier.PUBLIC, "Context", PAR_CONTEXT, "String", PAR_NAME)
-                .emitStatement("this.%1s = MPSPUtils.getSharedPref(%2s, %3s)", PREFERENCES, PAR_CONTEXT, PAR_NAME)
+                .emitStatement(multiProcess
+                                ? "this.%1s = MPSPUtils.getSharedPref(%2s, %3s)"
+                                : "this.%1s = %2s.getSharedPreferences(%3s, Context.MODE_PRIVATE)",
+                        PREFERENCES, PAR_CONTEXT, PAR_NAME)
                 .endConstructor();
 
         // constructor with preferences

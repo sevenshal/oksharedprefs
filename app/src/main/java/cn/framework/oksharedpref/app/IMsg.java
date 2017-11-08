@@ -10,11 +10,11 @@ import cn.framework.oksharedpref.annotations.Type;
  * Created by sevenshal on 2016/11/28.
  */
 
-@SharedPreference(value = "Msg", implSharedPreference = false, preferenceName = "msg")
+@SharedPreference(value = "Msg", implSharedPreference = false, preferenceName = "msg", multiProcess = false)
 public interface IMsg {
 
     @DefaultValue(value = "null", createDefaultGetter = false)
-    String USERID = "userName";
+    String USERID = "userId";
 
     @Type(PreferenceType.STRING_SET)
     @DefaultValue(value = "null", createDefaultGetter = false)
