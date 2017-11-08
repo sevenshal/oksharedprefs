@@ -4,12 +4,12 @@
 通过注解生成SharedPreferences实现的工具。解决安卓SharedPreferences多进程数据访问不一致的问题。
 ```
 
-##简介
+## 简介
 1.让你告别手写胶水代码管理SharedPreferences的包装类，通过注解的方式定义SharedPreferences包装类的属性和默认值。
 2.现在看来，安卓官方基本放弃了解决SharedPreferences跨进程访问不一致这一问题了，跨进程访问数据官方更加推荐ContentProvider。
 3.OkSharedPrefs将SharedPreferences和ContentProvider结合起来，让你使用SharedPreferences更加方便，并且通过ContentProvider交换数据，解决了跨进程数据访问不一致的问题。
 
-##安装
+## 安装
 
 ```groovy
 allprojects {
@@ -24,7 +24,7 @@ dependencies {
 }
 ```
 
-##用法
+## 用法
 
 定一个interface类并且如下所示添加注解：
 
@@ -72,7 +72,7 @@ public interface IMsg {
 
 ```
 
-##说明
+## 说明
 生成的类的名称通过 @SharedPreferences 的 value属性定义。生成的类名称为 value+Prefs，比如
 
 @SharedPreference(value = "Msg") 将生成 MsgPrefs 类。
