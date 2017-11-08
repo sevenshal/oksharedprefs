@@ -9,6 +9,21 @@
 2.现在看来，安卓官方基本放弃了解决SharedPreferences跨进程访问不一致这一问题了，跨进程访问数据官方更加推荐ContentProvider。
 3.OkSharedPrefs将SharedPreferences和ContentProvider结合起来，让你使用SharedPreferences更加方便，并且通过ContentProvider交换数据，解决了跨进程数据访问不一致的问题。
 
+##安装
+
+```groovy
+allprojects {
+		repositories {
+			maven { url 'https://jitpack.io' }
+		}
+	}
+
+dependencies {
+    compile 'com.github.sevenshal:api:1.0.0'
+    annotationProcessor 'com.github.sevenshal:processor:1.0.0'
+}
+```
+
 ##用法
 
 定一个interface类并且如下所示添加注解：
