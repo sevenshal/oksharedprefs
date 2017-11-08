@@ -27,9 +27,8 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
 
-    compile 'cn.framework.oksharedpref:api:1.0.0'
-    annotationProcessor 'cn.framework.oksharedpref:processor:1.0.0'
-
+    compile 'com.github.sevenshal.oksharedprefs:api:1.0.1'
+    annotationProcessor 'com.github.sevenshal.oksharedprefs:processor:1.0.1'
 
 //    compile project(':api')
 //    annotationProcessor project(':processor')

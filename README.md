@@ -19,8 +19,8 @@ allprojects {
 	}
 
 dependencies {
-    compile 'com.github.sevenshal:api:1.0.1'
-    annotationProcessor 'com.github.sevenshal:processor:1.0.1'
+    compile 'com.github.sevenshal.oksharedprefs:api:1.0.1'
+    annotationProcessor 'com.github.sevenshal.oksharedprefs:processor:1.0.1'
 }
 ```
 
