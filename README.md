@@ -8,6 +8,7 @@
 1. 让你告别手写胶水代码管理SharedPreferences的包装类，通过注解的方式定义SharedPreferences包装类的属性和默认值。
 2. 现在看来，安卓官方基本放弃了解决SharedPreferences跨进程访问不一致这一问题了，跨进程访问数据官方更加推荐ContentProvider。
 3. OkSharedPrefs将SharedPreferences和ContentProvider结合起来，让你使用SharedPreferences更加方便，并且通过ContentProvider交换数据，解决了跨进程数据访问不一致的问题。
+4. 底层仍然使用系统SharedPreferences实现，所以你的应用之前没有使用oksharedprefs，你可以很方便的移植，在新版本中加入这个库，已安装用户的原有数据不会有任何影响。
 
 ## 安装
 
