@@ -77,13 +77,13 @@ public interface IMsg {
 
 @SharedPreference(value = "Msg") 将生成 MsgPrefs 类。
 
-如果你不希望以Prefs结尾，preferencesSuffix 修改。
+如果你不希望以Prefs结尾，可以通过preferencesSuffix属性修改。
 
 @SharedPreference(value = "Msg", preferencesSuffix = "Preferences") 将生成 MsgPreferences类。
 
 OkSharedPrefs生成的包装类默认实现了SharedPreferences接口，
 这在key值通过变量方式存取时很方便，如果不希望生成的类实现SharedPreferences接口，
-可以通过将 implSharedPreference 设置为 false，关闭该功能。此种情况下，可以通过生成的类的prefs()获取SharedPreferences接口实例。所以这种情况下不要在interface中定义名为PREFS的属性。
+可以通过将 implSharedPreference 设置为 false，关闭该功能。此种情况下，可以通过生成的类的prefs()获取SharedPreferences接口实例。
 
 默认的SharedPreferences文件名为default_preferences，你可以通过 preferenceName 修改。
 
