@@ -74,7 +74,7 @@ public interface IMsg {
 ```
 
 ## 说明
-生成的类的名称通过 @SharedPreferences 的 value属性定义。生成的类名称为 value+Prefs，比如
+生成的类的名称通过 @SharedPreference 的 value属性定义。生成的类名称为 value+Prefs，比如
 
 @SharedPreference(value = "Msg") 将生成 MsgPrefs 类。
 
