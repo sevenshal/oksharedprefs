@@ -9,15 +9,15 @@ import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.DeadObjectException;
 import android.os.Handler;
 import android.os.Looper;
 
-import java.io.Serializable;
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 /**
  * 使用ContentProvider实现多进程SharedPreferences读写
@@ -44,15 +44,10 @@ public class OkSharedPrefContentProvider extends ContentProvider {
     private static final int CONTAINS = 8;
     private static final int APPLY = 9;
     private static final int COMMIT = 10;
-    private HashMap<String, Integer> mListenersCount;
 
-    @Override
-    public Bundle call(String method, String name, Bundle extras) {
-        if (!method.equals(METHOD_MP)) {
-            return null;
-        }
-        int mode = extras.getInt(KEY_MODE);
-        SharedPreferences sp = getSystemSharedPreferences(name, mode);
+    private HashMap<String, SharedPreferences.OnSharedPreferenceChangeListener> listenerHashMap;
+
+    private static Bundle handle(SharedPreferences sp, Bundle extras) {
         String key = extras.getString(KEY);
         int type = extras.getInt(KEY_TYPE);
         Bundle bundle = new Bundle();
@@ -76,15 +71,14 @@ public class OkSharedPrefContentProvider extends ContentProvider {
                 bundle.putBoolean(KEY_VALUE, sp.getBoolean(key, extras.getBoolean(KEY_VALUE)));
                 break;
             case GET_STRING_SET:
-                bundle.putSerializable(KEY_VALUE,
-                        new HashSet<>(
-                                sp.getStringSet(key, (Set<String>) extras.getSerializable(KEY_VALUE))));
+                bundle.putSerializable(KEY_VALUE, wrapperSet(
+                        sp.getStringSet(key, (Set<String>) extras.getSerializable(KEY_VALUE))));
                 break;
             case CONTAINS:
                 bundle.putBoolean(KEY_VALUE, sp.contains(key));
                 break;
             case APPLY:
-            case COMMIT: {
+            case COMMIT:
                 boolean clear = extras.getBoolean(KEY_CLEAR, false);
                 SharedPreferences.Editor editor = sp.edit();
                 if (clear) {
@@ -116,13 +110,49 @@ public class OkSharedPrefContentProvider extends ContentProvider {
                 } else {
                     bundle.putBoolean(KEY_VALUE, editor.commit());
                 }
-            }
-            break;
+                break;
+            default:
+                break;
         }
         return bundle;
     }
 
-    // 如果设备处在“安全模式”下，只有系统自带的ContentProvider才能被正常解析使用；
+    @Override
+    public Bundle call(String method, String name, Bundle extras) {
+        if (!method.equals(METHOD_MP)) {
+            return null;
+        }
+        int mode = extras.getInt(KEY_MODE);
+        SharedPreferences sp = getContext().getSharedPreferences(name, mode);
+        registListener(sp, name);
+        return handle(sp, extras);
+    }
+
+    void registListener(SharedPreferences pref, final String name) {
+        if (listenerHashMap == null || listenerHashMap.get(name) == null) {
+            synchronized (MPSPUtils.class) {
+                if (listenerHashMap == null) {
+                    listenerHashMap = new HashMap<>();
+                }
+                if (listenerHashMap.get(name) == null) {
+                    SharedPreferences.OnSharedPreferenceChangeListener listener = new SharedPreferences
+                            .OnSharedPreferenceChangeListener() {
+                        @Override
+                        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                            Uri uri = Uri.withAppendedPath(OkSharedPrefContentProvider.getAuthorityUri(getContext(), name), key);
+                            getContext().getContentResolver().notifyChange(uri, null);
+                        }
+                    };
+                    pref.registerOnSharedPreferenceChangeListener(listener);
+                    listenerHashMap.put(name, listener);
+                }
+            }
+        }
+    }
+
+    /**
+     * 如果设备处在“安全模式”下，只有系统自带的ContentProvider才能被正常解析使用；
+     */
     private static boolean isSafeMode(Context context) {
         boolean isSafeMode = false;
         try {
@@ -131,9 +161,7 @@ public class OkSharedPrefContentProvider extends ContentProvider {
             // java.lang.RuntimeException: Package manager has died
             // at android.app.ApplicationPackageManager.isSafeMode(ApplicationPackageManager.java:820)
         } catch (RuntimeException e) {
-            if (!isPackageManagerHasDiedException(e)) {
-                throw e;
-            }
+            e.printStackTrace();
         }
         return isSafeMode;
     }
@@ -150,29 +178,6 @@ public class OkSharedPrefContentProvider extends ContentProvider {
             }
         }
         return Uri.withAppendedPath(AUTHORITY_URI, name);
-    }
-
-    private static boolean isPackageManagerHasDiedException(Throwable e) {
-        if (e instanceof RuntimeException
-                && e.getMessage() != null
-                && e.getMessage().contains("Package manager has died")) {
-            Throwable cause = getLastCause(e);
-            if (cause instanceof DeadObjectException || cause.getClass().getName().equals("android.os.TransactionTooLargeException")) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean isUnstableCountException(Throwable e) {
-        if (e instanceof RuntimeException
-                && e.getMessage() != null
-                && e.getMessage().contains("unstableCount < 0: -1")) {
-            if (getLastCause(e) instanceof IllegalStateException) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -203,7 +208,7 @@ public class OkSharedPrefContentProvider extends ContentProvider {
      * @see Context#MODE_WORLD_WRITEABLE
      */
     public static SharedPreferences getSharedPreferences(Context context, String name, int mode) {
-        return new SharedPreferencesImpl(context, name, mode);
+        return isSafeMode(context) ? context.getSharedPreferences(name, mode) : new SharedPreferencesImpl(context, name, mode);
     }
 
     /**
@@ -221,20 +226,18 @@ public class OkSharedPrefContentProvider extends ContentProvider {
         private Context mContext;
         private String mName;
         private int mMode;
-        private boolean mIsSafeMode;
-        private Map<OnSharedPreferenceChangeListener, ContentObserverImpl> mListeners;
+        private WeakHashMap<OnSharedPreferenceChangeListener, ContentObserverImplHolder> mListeners;
 
         private SharedPreferencesImpl(Context context, String name, int mode) {
             mContext = context;
             mName = name;
             mMode = mode;
-            mIsSafeMode = isSafeMode(mContext);
         }
 
         @SuppressWarnings("unchecked")
         @Override
         public Map<String, ?> getAll() {
-            Map<String, ?> value = (Map<String, ?>) call(null, GET_ALL, null);
+            Map<String, ?> value = (Map<String, ?>) call(null, GET_ALL, new Bundle());
             return value == null ? new HashMap<String, Object>() : value;
         }
 
@@ -245,13 +248,11 @@ public class OkSharedPrefContentProvider extends ContentProvider {
             return (String) call(key, GET_STRING, arg);
         }
 
-        //	@Override // Android 3.0
+        @Override
         @SuppressWarnings("unchecked")
         public Set<String> getStringSet(String key, Set<String> defValues) {
             Bundle arg = new Bundle();
-            arg.putSerializable(KEY_VALUE, defValues == null ?
-                    null : (defValues instanceof Serializable ?
-                    (Serializable) defValues : new HashSet(defValues)));
+            arg.putSerializable(KEY_VALUE, wrapperSet(defValues));
             return (Set<String>) call(key, GET_STRING_SET, arg);
         }
 
@@ -285,9 +286,7 @@ public class OkSharedPrefContentProvider extends ContentProvider {
 
         @Override
         public boolean contains(String key) {
-            Bundle arg = new Bundle();
-            arg.putBoolean(KEY_VALUE, false);
-            return (Boolean) call(key, CONTAINS, arg);
+            return (Boolean) call(key, CONTAINS, new Bundle());
         }
 
         @Override
@@ -297,60 +296,96 @@ public class OkSharedPrefContentProvider extends ContentProvider {
 
         @Override
         public void registerOnSharedPreferenceChangeListener(final OnSharedPreferenceChangeListener listener) {
-            if (!mIsSafeMode) {
-                Uri uri = getAuthorityUri(mContext, mName);
-                ContentObserverImpl observer = new ContentObserverImpl(listener);
-                mContext.getContentResolver()
-                        .registerContentObserver(uri, true, observer);
-
-                getListeners().put(listener, observer);
-            }
+            Uri uri = getAuthorityUri(mContext, mName);
+            ContentObserverImplHolder observer = new ContentObserverImplHolder(listener);
+            mContext.getContentResolver()
+                    .registerContentObserver(uri, true, observer.observer);
+            getListeners().put(listener, observer);
         }
 
         @Override
         public void unregisterOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener listener) {
-            if (!mIsSafeMode) {
-                mContext.getContentResolver()
-                        .unregisterContentObserver(getListeners().get(listener));
+            ContentObserverImplHolder holder = getListeners().remove(listener);
+            if (holder != null) {
+                holder.observer.destroy();
             }
         }
 
-        private Map<OnSharedPreferenceChangeListener, ContentObserverImpl> getListeners() {
+        private Map<OnSharedPreferenceChangeListener, ContentObserverImplHolder> getListeners() {
             if (mListeners == null) {
                 synchronized (this) {
                     if (mListeners == null) {
-                        mListeners = new HashMap<>();
+                        mListeners = new WeakHashMap<>();
                     }
                 }
             }
             return mListeners;
         }
 
+        private class ContentObserverImplHolder {
+            ContentObserverImpl observer;
+
+            ContentObserverImplHolder(OnSharedPreferenceChangeListener listener) {
+                observer = new ContentObserverImpl(listener);
+            }
+
+            @Override
+            protected void finalize() throws Throwable {
+                try {
+                    observer.destroy();
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
+                super.finalize();
+            }
+        }
+
         private class ContentObserverImpl extends ContentObserver {
 
-            private OnSharedPreferenceChangeListener listener;
+            private WeakReference<OnSharedPreferenceChangeListener> listenerRef;
+
+            private boolean destroy;
 
             private ContentObserverImpl(OnSharedPreferenceChangeListener listener) {
                 super(uiHandler);
-                this.listener = listener;
+                this.listenerRef = new WeakReference<OnSharedPreferenceChangeListener>(listener);
+            }
+
+            public void destroy() {
+                if (!destroy) {
+                    synchronized (this) {
+                        if (!destroy) {
+                            mContext.getContentResolver()
+                                    .unregisterContentObserver(this);
+                            destroy = true;
+                        }
+                    }
+                }
             }
 
             @Override
             public void onChange(boolean selfChange, Uri uri) {
-                listener.onSharedPreferenceChanged(SharedPreferencesImpl.this, uri.getLastPathSegment());
+                OnSharedPreferenceChangeListener listener = listenerRef.get();
+                if (listener != null) {
+                    listener.onSharedPreferenceChanged(SharedPreferencesImpl.this, uri.getLastPathSegment());
+                } else {
+                    destroy();
+                }
             }
         }
 
         private Object call(String key, int type, Bundle arg) {
-            if (!mIsSafeMode) {
-                Uri uri = getAuthorityUri(mContext, mName);
-                arg.putInt(KEY_MODE, mMode);
-                arg.putString(KEY, key);
-                arg.putInt(KEY_TYPE, type);
+            Uri uri = getAuthorityUri(mContext, mName);
+            arg.putInt(KEY_MODE, mMode);
+            arg.putString(KEY, key);
+            arg.putInt(KEY_TYPE, type);
+            try {
                 Bundle ret = mContext.getContentResolver().call(uri, METHOD_MP, mName, arg);
                 return ret.get(KEY_VALUE);
+            } catch (Throwable e) {
+                e.printStackTrace();
+                return handle(mContext.getSharedPreferences(mName, mMode), arg).get(KEY_VALUE);
             }
-            return arg.get(KEY_VALUE);
         }
 
         public final class EditorImpl implements Editor {
@@ -433,24 +468,17 @@ public class OkSharedPrefContentProvider extends ContentProvider {
             }
 
             private boolean setValue(int type) {
-                synchronized (this) {
-                    try {
-                        Bundle extras = new Bundle();
-                        extras.putSerializable(KEY_VALUE, mModified);
-                        extras.putBoolean(KEY_CLEAR, mClear);
-                        return (Boolean) call(null, type, extras);
-                    } catch (IllegalArgumentException e) {
-                        e.printStackTrace();
-                    } catch (RuntimeException e) {
-                        if (!isPackageManagerHasDiedException(e) && !isUnstableCountException(e)) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                }
-                return false;
+                Bundle extras = new Bundle();
+                extras.putSerializable(KEY_VALUE, mModified);
+                extras.putBoolean(KEY_CLEAR, mClear);
+                return (Boolean) call(null, type, extras);
             }
         }
 
+    }
+
+    private static HashSet<String> wrapperSet(Set<String> set) {
+        return set == null ? null : (set instanceof HashMap ? (HashSet<String>) set : new HashSet<String>(set));
     }
 
     private static String makeAction(String name) {
@@ -488,13 +516,4 @@ public class OkSharedPrefContentProvider extends ContentProvider {
         throw new UnsupportedOperationException("No external delete");
     }
 
-    private SharedPreferences getSystemSharedPreferences(String name, int mode) {
-        return getContext().getSharedPreferences(name, mode);
-    }
-
-    private void checkInitListenersCount() {
-        if (mListenersCount == null) {
-            mListenersCount = new HashMap<String, Integer>();
-        }
-    }
 }
